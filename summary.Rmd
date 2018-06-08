@@ -1,0 +1,25 @@
+---
+output:
+    html_document:
+        theme: yeti
+title: "Summary of intervention effects"
+### Written by Edward Parker (edward.parker@imperial.ac.uk), 29 May 2018
+---
+
+```{r, echo=FALSE, message=FALSE, fig.height=3.5, fig.width=9}
+d = read.csv("Church_et_al_2018_summary.csv", stringsAsFactors = FALSE)
+d$Vaccine = as.factor(d$Vaccine)
+d$Vaccine = factor(d$Vaccine, levels = c("OCV", "RRV", "OPV"))
+
+library(ggplot2)
+ggplot(d, aes(y = RR, x = factor(Intervention), colour = Vaccine, shape = Studies)) + 
+  geom_point(aes(size=N), alpha = 0.9) + facet_grid(.~Vaccine) +
+  geom_errorbar(aes(ymin=CI_lower, ymax=CI_upper), alpha = 0.5, width=.01) + 
+  geom_hline(yintercept = 1, colour="black", linetype="dotted") + 
+  scale_shape_manual(values=c(16, 1)) + scale_size(breaks = c(100,500,1000), range = c(1,7)) +
+  xlab("") + ylab("Effect size (relative risk)") + scale_y_continuous(trans='log2', limits=c(0.5,4), breaks=c(0.5,1,2,4)) +
+  scale_color_manual(values = c("#90B11F", "#D43E55", "#F1A44F")) +
+  scale_x_discrete(limits = rev(levels(factor(d$Intervention)))) +
+  theme_bw() + coord_flip() + guides(colour=FALSE) + 
+  theme(panel.grid.minor = element_blank()) + labs(size = "N subjects", shape = "N studies")
+```

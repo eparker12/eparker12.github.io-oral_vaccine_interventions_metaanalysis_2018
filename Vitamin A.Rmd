@@ -1,0 +1,628 @@
+---
+output:
+    html_document:
+        theme: yeti
+        toc: true
+        toc_depth: 3
+        toc_float:
+            collapsed: false
+title: "Vitamin A"
+### Written by Edward Parker (edward.parker@imperial.ac.uk), 29 May 2018
+---
+
+## Full analysis
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Load packages required for meta-analysis
+library(metafor)
+library(forestplot)
+library(ggplot2)
+
+# Import data and plot settings
+data = read.csv("Church_et_al_2018_metaregression_input.csv",header=TRUE, stringsAsFactors=FALSE)
+settings = read.csv("Church_et_al_2018_plot_settings.csv",header=TRUE, stringsAsFactors=FALSE)
+
+# Select intervention, then subset data
+intervention = "Vitamin A"
+data1 = subset(data, Intervention_category==intervention)
+
+# Replace '--' with '-' characters in age column
+data1$Age_formatted = gsub("--", "-", data1$Age_formatted)
+
+# Set plotting parameters for selected intervention (axis limits, plot height, plot width, and footnote coordinates)
+forest_x_min_main	= settings[which(settings$intervention==intervention),"forest_x_min_main"]
+forest_x_max_main	= settings[which(settings$intervention==intervention),"forest_x_max_main"]
+forest_x_min_polio	= settings[which(settings$intervention==intervention),"forest_x_min_polio"]
+forest_x_max_polio	= settings[which(settings$intervention==intervention),"forest_x_max_polio"]
+plot_width_main	= settings[which(settings$intervention==intervention),"plot_width_main"]
+plot_width_polio	= settings[which(settings$intervention==intervention),"plot_width_polio"]
+plot_height_main = settings[which(settings$intervention==intervention),"plot_height_main"]
+plot_height_polio	= settings[which(settings$intervention==intervention),"plot_height_polio"]
+footnote_x_main = settings[which(settings$intervention==intervention),"footnote_x_main"]
+footnote_y_main = settings[which(settings$intervention==intervention),"footnote_y_main"]
+footnote_x_polio = settings[which(settings$intervention==intervention),"footnote_x_polio"]
+footnote_y_polio = settings[which(settings$intervention==intervention),"footnote_y_polio"]
+
+# Create subsets of data for each vaccine target
+data_cholera = subset(data1,Vaccine=="Cholera")
+data_rota = subset(data1,Vaccine=="Rotavirus")
+data_PV1 = subset(data1,Measure_of_SC=="OPV1 N-AB")
+data_PV2 = subset(data1,Measure_of_SC=="OPV2 N-AB")
+data_PV3 = subset(data1,Measure_of_SC=="OPV3 N-AB")
+
+# Create two collated versions of dataset - one for CV, RV and PV3; one for all types of polio
+data_all = rbind(data_cholera, data_rota, data_PV3)
+data_PV_all = rbind(data_PV1, data_PV2, data_PV3)
+
+# Set minimum study count for inclusion in meta-analysis
+min = 3
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Calculate sums of N by vaccine
+cholera_sum = sum(data_all$Total[data_all$Vaccine=="Cholera"])
+rota_sum = sum(data_all$Total[data_all$Vaccine=="Rotavirus"])
+polio_sum = sum(data_all$Total[data_all$Vaccine=="Polio"])
+overall_sum = sum(data_all$Total)
+
+# Calculate number of vaccines included in analysis
+n_vaccines = as.numeric(cholera_sum>0) + as.numeric(rota_sum>0) + as.numeric(polio_sum>0)
+
+# Calculate summary statistics for each subset
+if (cholera_sum>0) { dat_cholera = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_cholera, append = TRUE) }
+if (rota_sum>0) { dat_rota = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_rota, append = TRUE) }
+if (polio_sum>0) { dat_PV3 = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_PV3, append = TRUE) }
+dat_all = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_all, append = TRUE)
+
+# Perform REML meta-analyses
+if (cholera_sum>0) { meta_cholera = rma(yi, vi, data = dat_cholera, method = "REML") }
+if (rota_sum>0) { meta_rota = rma(yi, vi, data = dat_rota, method = "REML") }
+if (polio_sum>0) { meta_PV3 = rma(yi, vi, data = dat_PV3, method = "REML") }
+
+# Perform combined meta-analysis, including random effect on study ID if intervention is 'RVV separated from OPV' (to account for replication of infants for RVV and OPV outcomes)
+if (intervention=="RVV separated from OPV") { meta_all = rma.mv(yi, vi, data = dat_all, method = "REML", random = ~ 1 | Reference) }
+if (intervention!="RVV separated from OPV") { meta_all = rma(yi, vi, data = dat_all, method = "REML") }
+
+# Perform mixed-effects meta-regression, including random effect on study ID for 'RVV separated from OPV'
+if (nrow(dat_all)>=min & n_vaccines>1 & intervention=="RVV separated from OPV") { mixed_all = rma.mv(yi, vi, mods = ~ Vaccine, data = dat_all,  method = "REML", random = ~ 1 | Reference) }
+if (nrow(dat_all)>=min & n_vaccines>1 & intervention!="RVV separated from OPV") { mixed_all = rma(yi, vi, mods = ~ Vaccine, data = dat_all,  method = "REML") }
+if (n_vaccines==1) {
+    mixed_all = NA
+    mixed_all$QEp = mixed_all$QMp = 1 } # if there is only 1 vaccine type, assign arbitrary value of 1 to mixed_all p values so as to avoid errors in later logical operators
+
+# Create function to extract RRs and CIs from individual studies in rma meta-analysis output
+RR_CIs = function(x) {
+    paste0(formatC(round(exp(x$yi),2),format='f',digits=2)," (",formatC(round(exp(x$yi-1.96*sqrt(x$vi)),2),format='f',digits=2),"-",formatC(round(exp(x$yi+1.96*sqrt(x$vi)),2),format='f',digits=2),")")
+}
+
+# Create function to extract overall RRs and CIs from rma meta-analysis output
+RR_summary = function(x) {
+    paste0(formatC(round(exp(x$b),2),format='f',digits=2)," (", formatC(round(exp(x$b-1.96*x$se),2),format='f',digits=2), "-", formatC(round(exp(x$b+1.96*x$se),2),format='f',digits=2),")")
+}
+
+# Create function to collate relevant data for each column of forest plot
+table_column = function(column_title, ref) {
+    column = column_title # specify column title
+    if (nrow(data_cholera)>0) { column = c(column,NA,data_cholera[,ref]) } # add study-specific rows if there is at least one study
+    if (nrow(data_cholera)<min & nrow(data_cholera)>0) { column = c(column,NA) } # add gap if number of studies is <min
+    if (nrow(data_cholera)>=min) { column = c(column,NA,NA) } # add summary row if number of studies is >=min
+    
+    if (nrow(data_rota)>0) { column = c(column,NA,data_rota[,ref]) }
+    if (nrow(data_rota)<min & nrow(data_rota)>0) { column = c(column,NA) }
+    if (nrow(data_rota)>=min) { column = c(column,NA,NA) }
+    
+    if (nrow(data_PV3)>0) { column = c(column,NA,data_PV3[,ref]) }
+    if (nrow(data_PV3)<min & nrow(data_PV3)>0) { column = c(column,NA) }
+    if (nrow(data_PV3)>=min) { column = c(column,NA,NA) }
+    
+    if (nrow(data_all)>=min & n_vaccines>1) { column = c(column,NA) }
+    if (nrow(data_all)>=min & n_vaccines==1) { column = column[-length(column)] }
+    return(column)
+}
+
+# Use function to create meta-data columns for forest plot
+country = table_column(column_title="Country", ref="Country")
+age = table_column(column_title="Age (m)", ref="Age_formatted")
+vaccine = table_column(column_title="Vaccine", ref="Vaccine_formatted")
+intervention = table_column(column_title="Intervention", ref="Intervention_formatted")
+N_int = table_column(column_title="n/N (%)", ref="Int_SC_full")
+control = table_column(column_title="Control", ref="Control_formatted")
+N_ctrl = table_column(column_title="n/N (%)", ref="Ctrl_SC_full")
+
+# Create first column composed of Study IDs and vaccine names
+titles = "Study"
+if (nrow(data_cholera)>0) { titles = c(titles,"Cholera",data_cholera$Reference) }
+if (nrow(data_cholera)<min & nrow(data_cholera)>0) { titles = c(titles,NA) }
+if (nrow(data_cholera)>=min) { titles = c(titles,"Summary",NA) }
+
+if (nrow(data_rota)>0) { titles = c(titles,"Rotavirus",data_rota$Reference) }
+if (nrow(data_rota)<min & nrow(data_rota)>0) { titles = c(titles,NA) }
+if (nrow(data_rota)>=min) { titles = c(titles,"Summary",NA) }
+
+if (nrow(data_PV3)>0) { titles = c(titles,"OPV3",data_PV3$Reference) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { titles = c(titles,NA) }
+if (nrow(data_PV3)>=min) { titles = c(titles,"Summary",NA) }
+
+if (nrow(data_all)>=min & n_vaccines>1) { titles = c(titles, "Overall") }
+if (nrow(data_all)>=min & n_vaccines==1) { titles = titles[-length(titles)] }
+
+# Create final column composed of RRs and 95% CIs
+RRs = "RR (95% CI)"
+if (nrow(data_cholera)>0) { RRs = c(RRs,NA,RR_CIs(meta_cholera)) }
+if (nrow(data_cholera)<min & nrow(data_cholera)>0) { RRs = c(RRs,NA) }
+if (nrow(data_cholera)>=min) { RRs = c(RRs,RR_summary(meta_cholera),NA) }
+
+if (nrow(data_rota)>0) { RRs = c(RRs,NA,RR_CIs(meta_rota)) }
+if (nrow(data_rota)<min & nrow(data_rota)>0) { RRs = c(RRs,NA) }
+if (nrow(data_rota)>=min) { RRs = c(RRs,RR_summary(meta_rota),NA) }
+
+if (nrow(data_PV3)>0) { RRs = c(RRs,NA,RR_CIs(meta_PV3)) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { RRs = c(RRs,NA) }
+if (nrow(data_PV3)>=min) { RRs = c(RRs,RR_summary(meta_PV3),NA) }
+
+if (nrow(data_all)>=min & n_vaccines>1) { RRs = c(RRs,RR_summary(meta_all)) }
+if (nrow(data_all)>=min & n_vaccines==1) { RRs = RRs[-length(RRs)] }
+
+# Collate forest plot text
+tabletext = cbind(titles, country, age, vaccine, intervention, N_int, control, N_ctrl, RRs)
+
+# Create variable composed of RRs
+m = NA
+if (nrow(data_cholera)>0) { m = c(m,NA,meta_cholera$yi) }
+if (nrow(data_cholera)<min & nrow(data_cholera)>0) { m = c(m,NA) }
+if (nrow(data_cholera)>=min) { m = c(m,meta_cholera$b,NA) }
+
+if (nrow(data_rota)>0) { m = c(m,NA,meta_rota$yi) }
+if (nrow(data_rota)<min & nrow(data_rota)>0) { m = c(m,NA) }
+if (nrow(data_rota)>=min) { m = c(m,meta_rota$b,NA) }
+
+if (nrow(data_PV3)>0) { m = c(m,NA,meta_PV3$yi) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { m = c(m,NA) }
+if (nrow(data_PV3)>=min) { m = c(m,meta_PV3$b,NA) }
+
+if (nrow(data_all)>=min & n_vaccines>1) { m = c(m,meta_all$b) }
+if (nrow(data_all)>=min & n_vaccines==1) { m = m[-length(m)] }
+
+# Create variables for lower CI limits of RR estimates
+l = NA
+if (nrow(data_cholera)>0) { l = c(l,NA,meta_cholera$yi-sqrt(meta_cholera$vi)*1.96) }
+if (nrow(data_cholera)<min & nrow(data_cholera)>0) { l = c(l,NA) }
+if (nrow(data_cholera)>=min) { l = c(l,meta_cholera$b-meta_cholera$se*1.96,NA) }
+
+if (nrow(data_rota)>0) { l = c(l,NA,meta_rota$yi-sqrt(meta_rota$vi)*1.96) }
+if (nrow(data_rota)<min & nrow(data_rota)>0) { l = c(l,NA) }
+if (nrow(data_rota)>=min) { l = c(l,meta_rota$b-meta_rota$se*1.96,NA) }
+
+if (nrow(data_PV3)>0) { l = c(l,NA,meta_PV3$yi-sqrt(meta_PV3$vi)*1.96) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { l = c(l,NA) }
+if (nrow(data_PV3)>=min) { l = c(l,meta_PV3$b-meta_PV3$se*1.96,NA) }
+
+if (nrow(data_all)>=min & n_vaccines>1) { l = c(l,meta_all$b-meta_all$se*1.96) }
+if (nrow(data_all)>=min & n_vaccines==1) { l = l[-length(l)] }
+
+# Create variables for upper CI limits of RR estimates
+u = NA
+if (nrow(data_cholera)>0) { u = c(u,NA,meta_cholera$yi+sqrt(meta_cholera$vi)*1.96) }
+if (nrow(data_cholera)<min & nrow(data_cholera)>0) { u = c(u,NA) }
+if (nrow(data_cholera)>=min) { u = c(u,meta_cholera$b+meta_cholera$se*1.96,NA) }
+
+if (nrow(data_rota)>0) { u = c(u,NA,meta_rota$yi+sqrt(meta_rota$vi)*1.96) }
+if (nrow(data_rota)<min & nrow(data_rota)>0) { u = c(u,NA) }
+if (nrow(data_rota)>=min) { u = c(u,meta_rota$b+meta_rota$se*1.96,NA) }
+
+if (nrow(data_PV3)>0) { u = c(u,NA,meta_PV3$yi+sqrt(meta_PV3$vi)*1.96) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { u = c(u,NA) }
+if (nrow(data_PV3)>=min) { u = c(u,meta_PV3$b+meta_PV3$se*1.96,NA) }
+
+if (nrow(data_all)>=min & n_vaccines>1) { u = c(u,meta_all$b+meta_all$se*1.96) }
+if (nrow(data_all)>=min & n_vaccines==1) { u = u[-length(u)] }
+```
+
+### Forest plot
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=plot_width_main, fig.height=plot_height_main}
+# Create function to assign colours to meta-analysis boxes and lines
+# Adapted from: https://stackoverflow.com/questions/46938910
+fn <- local({
+    i = 0
+    b_clrs = vector()
+    if (nrow(data_cholera)>0) { b_clrs = rep("#90B11F", nrow(data_cholera)) }
+    if (nrow(data_rota)>0) { b_clrs = c(b_clrs, rep("#D43E55", nrow(data_rota))) }
+    if (nrow(data_PV3)>0) { b_clrs = c(b_clrs, rep("#F1A44F", nrow(data_PV3))) }
+    b_clrs = c(b_clrs, "black")
+    l_clrs = rep("grey", length(b_clrs))
+    # l_clrs = b_clrs # use this line instead of the line above to make lines the same colour as the boxes
+    
+    function(..., clr.line, clr.marker){
+        i <<- i + 1
+        fpDrawNormalCI(..., clr.line = l_clrs[i], clr.marker = b_clrs[i])
+    }
+})
+
+# Create function to assign colours to meta-analysis summary diamonds
+# Adapted from: https://stackoverflow.com/questions/46938910
+fn_sum <- local({
+    i = 0
+    b_clrs_sum = vector()
+    if (nrow(data_cholera)>=min) { b_clrs_sum = 	"#90B11F" }
+    if (nrow(data_rota)>=min) { b_clrs_sum = c(b_clrs_sum, "#D43E55") }
+    if (nrow(data_PV3)>=min) { b_clrs_sum = c(b_clrs_sum, "#F1A44F") }
+    b_clrs_sum = c(b_clrs_sum, "black")
+    function(..., col){
+        i <<- i + 1
+        fpDrawSummaryCI(..., col = b_clrs_sum[i])
+    }
+})
+
+# Creat forest plot
+if (nrow(data_all)>=min) {
+    forestplot(tabletext,exp(m),exp(l),exp(u),zero=1,
+    is.summary=c(TRUE,TRUE,!is.na(tabletext[3:nrow(tabletext),1]) & (tabletext[3:nrow(tabletext),1]=="Summary" | tabletext[3:nrow(tabletext),1]=="Overall"| tabletext[3:nrow(tabletext),1]=="Cholera"| tabletext[3:nrow(tabletext),1]=="Rotavirus"| tabletext[3:nrow(tabletext),1]=="OPV3")),
+    clip=c(forest_x_min_main,forest_x_max_main), xlog=TRUE,
+    xticks=c(forest_x_min_main,1,forest_x_max_main),
+    fn.ci_norm=fn,
+    fn.ci_sum=fn_sum,
+    colgap=unit(5,"mm"),
+    txt_gp = fpTxtGp(ticks = gpar(cex=0.8))
+    )
+    
+    # Add footnote containing heterogeneity results
+    if (nrow(dat_all)>=min & n_vaccines>1 & mixed_all$QEp>=0.001) {
+        grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_all$QM,2),format='f',digits=2), ", df ", mixed_all$m, "), p = ", formatC(round(mixed_all$QMp,3),format='f',digits=3),
+        "; Residual heterogeneity (Qe ", formatC(round(mixed_all$QE,2),format='f',digits=2), ", df ", mixed_all$k-mixed_all$p, "), p = ", formatC(round(mixed_all$QEp,3),format='f',digits=3)),
+        footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
+    if (nrow(dat_all)>=min & n_vaccines>1 & mixed_all$QEp<0.001) {
+        grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_all$QM,2),format='f',digits=2), ", df ", mixed_all$m, "), p = ", formatC(round(mixed_all$QMp,3),format='f',digits=3),
+        "; Residual heterogeneity (Qe ", formatC(round(mixed_all$QE,2),format='f',digits=2), ", df ", mixed_all$k-mixed_all$p, "), p < 0.001"),
+        footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
+    
+    if (nrow(dat_all)>=min & n_vaccines==1 & meta_all$QEp>=0.001) {
+        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_all$QE,2),format='f',digits=2), ", df ", meta_all$k-meta_all$p, "), p = ", formatC(round(meta_all$QEp,3),format='f',digits=3)),
+        footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
+    if (nrow(dat_all)>=min & n_vaccines==1 & meta_all$QEp<0.001) {
+        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_all$QE,2),format='f',digits=2), ", df ", meta_all$k-meta_all$p, "), p < 0.001"),
+        footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
+    
+} else { print("Insufficient studies (n<3)") }
+```
+
+### Funnel plot
+
+```{r, echo=FALSE, message=FALSE, fig.height=3, fig.width=6}
+# Draw funnel plot containing all results included in meta-analysis
+overall_estimate = meta_all$b
+funnel_input = data.frame(SE = sqrt(meta_all$vi), LogRR = meta_all$yi, Vaccine = data_all$Vaccine, N = data_all$Total)
+ggplot(funnel_input, aes(y=SE, x=LogRR)) + geom_point(aes(color = Vaccine), size=3.5, alpha=0.7) +
+geom_vline(xintercept=overall_estimate, color='grey', linetype='dashed') + theme_minimal() +
+ylab('SE (log RR)') + xlab('log RR') +  scale_y_reverse() + xlim(-2,2) +
+scale_color_manual(values = c("Cholera" = "#90B11F", "Polio" = "#F1A44F" , "Rotavirus" =  "#D43E55")) +
+theme(legend.title=element_blank(), legend.position="right")
+```
+
+### Egger's test
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Perform Egger's test; for 'RVV separated from OPV', this should be stratified by vaccine type to account for replication of infants for RVV and OPV outcomes
+if (nrow(dat_all)>=min & intervention!="RVV separated from OPV" & mixed_all$QMp>=0.05) {
+    print("No replication of infants across vaccines or significant vaccine effect, therefore combined test performed")
+    regtest(meta_all, predictor="sei") }
+
+if (nrow(dat_all)>=min & (intervention=="RVV separated from OPV" | mixed_all$QMp<0.05)) {
+    print("Infants replicated across vaccines or vaccine effect significant, therefore separate tests performed")
+    print("Cholera:")
+    if (nrow(data_cholera)>=min) { print(regtest(meta_cholera, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+    print("Rotavirus:")
+    if (nrow(data_rota)>=min) { print(regtest(meta_rota, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+    print("OPV3:")
+    if (nrow(data_PV3)>=min) { print(regtest(meta_PV3, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+}
+```
+
+### Meta-analysis output
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nrow(data_all)>=min) { summary(meta_all) } else { print("Insufficient studies (n<3)") }
+```
+
+### Meta-regression output
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# If more than one type of vaccine included in analysis, print meta-regression results
+if (nrow(dat_all)>=min & n_vaccines>1) { mixed_all } else {  print("Insufficient studies for meta-regression (either <3 studies or only 1 vaccine type)") }
+```
+
+### Intervention-specific outputs
+
+#### Summary of cholera studies
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nrow(data_cholera)>=min) { summary(meta_cholera) } else { print("Insufficient studies (n<3)")}
+```
+
+#### Summary of rotavirus studies
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nrow(data_rota)>=min) { summary(meta_rota) } else { print("Insufficient studies (n<3)")}
+```
+
+#### Summary of PV3 studies
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nrow(data_PV3)>=min) { summary(meta_PV3) } else { print("Insufficient studies (n<3)")}
+```
+
+## OPV-specific analysis
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Calculate sums of N by vaccine
+PV1_sum = sum(data_PV_all$Total[data_PV_all$Measure_of_SC=="OPV1 N-AB"])
+PV2_sum = sum(data_PV_all$Total[data_PV_all$Measure_of_SC=="OPV2 N-AB"])
+PV3_sum = sum(data_PV_all$Total[data_PV_all$Measure_of_SC=="OPV3 N-AB"])
+overall_PV_sum = sum(data_PV_all$Total)
+
+# Calculate number of vaccines included in analysis
+n_PV_vaccines = as.numeric(PV1_sum>0) + as.numeric(PV2_sum>0) + as.numeric(PV3_sum>0)
+
+# Calculate summary statistics for each subset
+if (PV1_sum>0) {dat_PV1 = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_PV1, append = TRUE) }
+if (PV2_sum>0) {dat_PV2 = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_PV2, append = TRUE) }
+if (PV3_sum>0) {dat_PV3 = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_PV3, append = TRUE) }
+if (overall_PV_sum>0) {dat_PV_all = escalc(measure = "RR", ai = Int_SC_n, bi = Int_N-Int_SC_n, ci = Ctrl_SC_n, di = Ctrl_N-Ctrl_SC_n, data = data_PV_all, append = TRUE) }
+
+# Perform REML meta-analyses
+if (PV1_sum>0) { meta_PV1 = rma(yi, vi, data = dat_PV1, method = "REML") }
+if (PV2_sum>0) { meta_PV2 = rma(yi, vi, data = dat_PV2, method = "REML") }
+if (PV3_sum>0) { meta_PV3 = rma(yi, vi, data = dat_PV3, method = "REML") }
+
+# Perform combined meta-analysis, including random effect on study ID
+if (overall_PV_sum>0) { meta_PV_all = rma.mv(yi, vi, data = dat_PV_all, method = "REML", random = ~ 1 | Reference) }
+
+# Perform mixed-effects meta-regression, including random effect on study ID
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { mixed_PV_all = rma.mv(yi, vi, mods = ~ Measure_of_SC, data = dat_PV_all,  method = "REML", random = ~ 1 | Reference) }
+if (n_PV_vaccines==1) {
+    mixed_PV_all = NA
+    mixed_PV_all$QEp = mixed_PV_all$QMp = 1 } # if there is only 1 vaccine type, assign arbitrary value of 1 to mixed_all p values so as to avoid errors in later logical operators
+
+# Create function to collate relevant data for each column of PV-specific forest plot
+table_column_PV = function(column_title, ref) {
+    column = column_title # specify column title
+    if (nrow(data_PV1)>0) { column = c(column,NA,data_PV1[,ref]) } # add study-specific rows if there is at least one study
+    if (nrow(data_PV1)<min & nrow(data_PV1)>0) { column = c(column,NA) } # add gap if number of studies is <min
+    if (nrow(data_PV1)>=min) { column = c(column,NA,NA) } # add summary row if number of studies is >=min
+    
+    if (nrow(data_PV2)>0) { column = c(column,NA,data_PV2[,ref]) }
+    if (nrow(data_PV2)<min & nrow(data_PV2)>0) { column = c(column,NA) }
+    if (nrow(data_PV2)>=min) { column = c(column,NA,NA) }
+    
+    if (nrow(data_PV3)>0) { column = c(column,NA,data_PV3[,ref]) }
+    if (nrow(data_PV3)<min & nrow(data_PV3)>0) { column = c(column,NA) }
+    if (nrow(data_PV3)>=min) { column = c(column,NA,NA) }
+    if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { column = c(column,NA) }
+    if (nrow(data_PV_all)>=min & n_PV_vaccines==1) { column = column[-length(column)] }
+    return(column)
+}
+
+# Use function to create meta-data columns for forest plot
+country = table_column_PV(column_title="Country", ref="Country")
+age = table_column_PV(column_title="Age (m)", ref="Age_formatted")
+vaccine = table_column_PV(column_title="Vaccine", ref="Vaccine_formatted")
+intervention = table_column_PV(column_title="Intervention", ref="Intervention_formatted")
+N_int = table_column_PV(column_title="n/N (%)", ref="Int_SC_full")
+control = table_column_PV(column_title="Control", ref="Control_formatted")
+N_ctrl = table_column_PV(column_title="n/N (%)", ref="Ctrl_SC_full")
+
+# Create first column composed of Study IDs and vaccine names
+titles = "Study"
+if (nrow(data_PV1)>0) { titles = c(titles,"OPV1",data_PV1$Reference) }
+if (nrow(data_PV1)<min & nrow(data_PV1)>0) { titles = c(titles,NA) }
+if (nrow(data_PV1)>=min) { titles = c(titles,"Summary",NA) }
+
+if (nrow(data_PV2)>0) { titles = c(titles,"OPV2",data_PV2$Reference) }
+if (nrow(data_PV2)<min & nrow(data_PV2)>0) { titles = c(titles,NA) }
+if (nrow(data_PV2)>=min) { titles = c(titles,"Summary",NA) }
+
+if (nrow(data_PV3)>0) { titles = c(titles,"OPV3",data_PV3$Reference) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { titles = c(titles,NA) }
+if (nrow(data_PV3)>=min) { titles = c(titles,"Summary",NA) }
+
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { titles = c(titles, "Overall") }
+if (nrow(data_PV_all)>=min & n_PV_vaccines==1) { titles = titles[-length(titles)] }
+
+# Create final column composed of RRs and 95% CIs
+RRs = "RR (95% CI)"
+if (nrow(data_PV1)>0) { RRs = c(RRs,NA,RR_CIs(meta_PV1)) }
+if (nrow(data_PV1)<min & nrow(data_PV1)>0) { RRs = c(RRs,NA) }
+if (nrow(data_PV1)>=min) { RRs = c(RRs,RR_summary(meta_PV1),NA) }
+
+if (nrow(data_PV2)>0) { RRs = c(RRs,NA,RR_CIs(meta_PV2)) }
+if (nrow(data_PV2)<min & nrow(data_PV2)>0) { RRs = c(RRs,NA) }
+if (nrow(data_PV2)>=min) { RRs = c(RRs,RR_summary(meta_PV2),NA) }
+
+if (nrow(data_PV3)>0) { RRs = c(RRs,NA,RR_CIs(meta_PV3)) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { RRs = c(RRs,NA) }
+if (nrow(data_PV3)>=min) { RRs = c(RRs,RR_summary(meta_PV3),NA) }
+
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { RRs = c(RRs,RR_summary(meta_PV_all)) }
+if (nrow(data_PV_all)>=min & n_PV_vaccines==1) { RRs = RRs[-length(RRs)] }
+
+# Collate forest plot text
+tabletext = cbind(titles, country, age, vaccine, intervention, N_int, control, N_ctrl, RRs)
+
+# Create variable composed of RRs
+m = NA
+if (nrow(data_PV1)>0) { m = c(m,NA,meta_PV1$yi) }
+if (nrow(data_PV1)<min & nrow(data_PV1)>0) { m = c(m,NA) }
+if (nrow(data_PV1)>=min) { m = c(m,meta_PV1$b,NA) }
+
+if (nrow(data_PV2)>0) { m = c(m,NA,meta_PV2$yi) }
+if (nrow(data_PV2)<min & nrow(data_PV2)>0) { m = c(m,NA) }
+if (nrow(data_PV2)>=min) { m = c(m,meta_PV2$b,NA) }
+
+if (nrow(data_PV3)>0) { m = c(m,NA,meta_PV3$yi) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { m = c(m,NA) }
+if (nrow(data_PV3)>=min) { m = c(m,meta_PV3$b,NA) }
+
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { m = c(m,meta_PV_all$b) }
+if (nrow(data_PV_all)>=min & n_PV_vaccines==1) { m = m[-length(m)] }
+
+# Create variables for lower CI limits of RR estimates
+l = NA
+if (nrow(data_PV1)>0) { l = c(l,NA,meta_PV1$yi-sqrt(meta_PV1$vi)*1.96) }
+if (nrow(data_PV1)<min & nrow(data_PV1)>0) { l = c(l,NA) }
+if (nrow(data_PV1)>=min) { l = c(l,meta_PV1$b-meta_PV1$se*1.96,NA) }
+
+if (nrow(data_PV2)>0) { l = c(l,NA,meta_PV2$yi-sqrt(meta_PV2$vi)*1.96) }
+if (nrow(data_PV2)<min & nrow(data_PV2)>0) { l = c(l,NA) }
+if (nrow(data_PV2)>=min) { l = c(l,meta_PV2$b-meta_PV2$se*1.96,NA) }
+
+if (nrow(data_PV3)>0) { l = c(l,NA,meta_PV3$yi-sqrt(meta_PV3$vi)*1.96) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { l = c(l,NA) }
+if (nrow(data_PV3)>=min) { l = c(l,meta_PV3$b-meta_PV3$se*1.96,NA) }
+
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { l = c(l,meta_PV_all$b-meta_PV_all$se*1.96) }
+if (nrow(data_PV_all)>=min & n_PV_vaccines==1) { l = l[-length(l)] }
+
+# Create variables for upper CI limits of RR estimates
+u = NA
+if (nrow(data_PV1)>0) { u = c(u,NA,meta_PV1$yi+sqrt(meta_PV1$vi)*1.96) }
+if (nrow(data_PV1)<min & nrow(data_PV1)>0) { u = c(u,NA) }
+if (nrow(data_PV1)>=min) { u = c(u,meta_PV1$b+meta_PV1$se*1.96,NA) }
+
+if (nrow(data_PV2)>0) { u = c(u,NA,meta_PV2$yi+sqrt(meta_PV2$vi)*1.96) }
+if (nrow(data_PV2)<min & nrow(data_PV2)>0) { u = c(u,NA) }
+if (nrow(data_PV2)>=min) { u = c(u,meta_PV2$b+meta_PV2$se*1.96,NA) }
+
+if (nrow(data_PV3)>0) { u = c(u,NA,meta_PV3$yi+sqrt(meta_PV3$vi)*1.96) }
+if (nrow(data_PV3)<min & nrow(data_PV3)>0) { u = c(u,NA) }
+if (nrow(data_PV3)>=min) { u = c(u,meta_PV3$b+meta_PV3$se*1.96,NA) }
+
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { u = c(u,meta_PV_all$b+meta_PV_all$se*1.96) }
+if (nrow(data_PV_all)>=min & n_PV_vaccines==1) { u = u[-length(u)] }
+```
+
+### Forest plot
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=plot_width_polio, fig.height=plot_height_polio}
+# Create function to assign colours to meta-analysis boxes and lines
+# Adapted from: https://stackoverflow.com/questions/46938910
+fn <- local({
+    i = 0
+    b_clrs = vector()
+    if (nrow(data_PV1)>0) { b_clrs = rep("#f1cd4f", nrow(data_PV1)) }
+    if (nrow(data_PV2)>0) { b_clrs = c(b_clrs, rep("#734109", nrow(data_PV2))) }
+    if (nrow(data_PV3)>0) { b_clrs = c(b_clrs, rep("#F1A44F", nrow(data_PV3))) }
+    b_clrs = c(b_clrs, "black")
+    l_clrs = rep("grey", length(b_clrs))
+    # l_clrs = b_clrs # use this line instead of the line above to make lines the same colour as the boxes
+    
+    function(..., clr.line, clr.marker){
+        i <<- i + 1
+        fpDrawNormalCI(..., clr.line = l_clrs[i], clr.marker = b_clrs[i])
+    }
+})
+
+# Create function to assign colours to meta-analysis summary diamonds
+# Adapted from: https://stackoverflow.com/questions/46938910
+fn_sum <- local({
+    i = 0
+    b_clrs_sum = vector()
+    if (nrow(data_PV1)>=min) { b_clrs_sum = 	"#f1cd4f" }
+    if (nrow(data_PV2)>=min) { b_clrs_sum = c(b_clrs_sum, "#734109") }
+    if (nrow(data_PV3)>=min) { b_clrs_sum = c(b_clrs_sum, "#F1A44F") }
+    b_clrs_sum = c(b_clrs_sum, "black")
+    function(..., col){
+        i <<- i + 1
+        fpDrawSummaryCI(..., col = b_clrs_sum[i])
+    }
+})
+
+# Creat forest plot
+if (nrow(data_PV_all)>=min) {
+    forestplot(tabletext,exp(m),exp(l),exp(u),zero=1,
+    is.summary=c(TRUE,TRUE,!is.na(tabletext[3:nrow(tabletext),1]) & (tabletext[3:nrow(tabletext),1]=="Summary" | tabletext[3:nrow(tabletext),1]=="Overall"| tabletext[3:nrow(tabletext),1]=="OPV1"| tabletext[3:nrow(tabletext),1]=="OPV2"| tabletext[3:nrow(tabletext),1]=="OPV3")),
+    clip=c(forest_x_min_polio,forest_x_max_polio), xlog=TRUE,
+    xticks=c(forest_x_min_polio,1,forest_x_max_polio),
+    fn.ci_norm=fn,
+    fn.ci_sum=fn_sum,
+    colgap=unit(5,"mm"),
+    txt_gp = fpTxtGp(ticks = gpar(cex=0.8))
+    )
+    
+    # Add footnote containing heterogeneity results
+    if (nrow(data_PV_all)>=min & n_PV_vaccines>1 & mixed_PV_all$QEp>=0.001) {
+        grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_PV_all$QM,2),format='f',digits=2), ", df ", mixed_PV_all$m, "), p = ", formatC(round(mixed_PV_all$QMp,3),format='f',digits=3),
+        "; Residual heterogeneity (Qe ", formatC(round(mixed_PV_all$QE,2),format='f',digits=2), ", df ", mixed_PV_all$k-mixed_PV_all$p, "), p = ", formatC(round(mixed_PV_all$QEp,3),format='f',digits=3)),
+        footnote_x_polio, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
+    if (nrow(data_PV_all)>=min & n_PV_vaccines>1 & mixed_PV_all$QEp<0.001) {
+        grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_PV_all$QM,2),format='f',digits=2), ", df ", mixed_PV_all$m, "), p = ", formatC(round(mixed_PV_all$QMp,3),format='f',digits=3),
+        "; Residual heterogeneity (Qe ", formatC(round(mixed_PV_all$QE,2),format='f',digits=2), ", df ", mixed_PV_all$k-mixed_PV_all$p, "), p < 0.001"),
+        footnote_x_polio, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
+    
+    if (nrow(data_PV_all)>=min & n_PV_vaccines==1 & meta_PV_all$QEp>=0.001) {
+        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_PV_all$QE,2),format='f',digits=2), ", df ", meta_PV_all$k-meta_PV_all$p, "), p = ", formatC(round(meta_PV_all$QEp,3),format='f',digits=3)),
+        0.1, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
+    if (nrow(data_PV_all)>=min & n_PV_vaccines==1 & meta_PV_all$QEp<0.001) {
+        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_PV_all$QE,2),format='f',digits=2), ", df ", meta_PV_all$k-meta_PV_all$p, "), p < 0.001"),
+        0.1, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
+    
+} else { print("Insufficient studies (n<3)")}
+```
+
+### Funnel plot
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3, fig.width=6}
+# Draw funnel plot containing all results included in meta-analysis
+if (overall_PV_sum>0) {
+    overall_estimate = meta_PV_all$b
+    funnel_input = data.frame(SE = sqrt(meta_PV_all$vi), LogRR = meta_PV_all$yi,
+    Vaccine = substr(data_PV_all$Measure_of_SC,0,4), N = data_PV_all$Total, Study = data_PV_all$Reference)
+    ggplot(funnel_input, aes(y=SE, x=LogRR)) + geom_point(aes(color = Vaccine), size=3.5, alpha=0.7) +
+    geom_vline(xintercept=overall_estimate, color='grey', linetype='dashed') + theme_minimal() +
+    ylab('SE (log RR)') + xlab('log RR') +  scale_y_reverse() + xlim(-2,2) +
+    scale_color_manual(values = c("OPV1" = "#f1cd4f", "OPV2" = "#734109" , "OPV3" =  "#F1A44F")) +
+    theme(legend.title=element_blank(), legend.position="right")
+} else { print("Insufficient studies (n<3)")}
+```
+
+### Egger's test
+
+Infants replicated across vaccines, therefore separate tests performed
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Perform Egger's test; this should be stratified by vaccine type to account for replication of infants across PV serotypes
+print("OPV1:")
+if (nrow(data_PV1)>=min) { print(regtest(meta_PV1, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+print("OPV2:")
+if (nrow(data_PV2)>=min) { print(regtest(meta_PV2, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+print("OPV3:")
+if (nrow(data_PV3)>=min) { print(regtest(meta_PV3, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+```
+
+### Meta-analysis output
+```{r, echo=FALSE, message=TRUE, warning=TRUE}
+if (nrow(data_PV_all)>=min) { summary(meta_PV_all) } else { print("Insufficient studies (n<3)")}
+```
+
+### Meta-regression output
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# If more than one type of vaccine included in analysis, print meta-regression results
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { mixed_PV_all } else {  print("Insufficient studies for meta-regression (either <3 studies or only 1 vaccine type)") }
+```
+
+### Serotype-specific outputs
+
+#### Summary of PV1 studies
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nrow(data_PV1)>=min) { summary(meta_PV1) } else { print("Insufficient studies (n<3)")}
+```
+
+#### Summary of PV2 studies
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nrow(data_PV2)>=min) { summary(meta_PV2) } else { print("Insufficient studies (n<3)")}
+```
+
+#### Summary of PV3 studies
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nrow(data_PV3)>=min) { summary(meta_PV3) } else { print("Insufficient studies (n<3)")}
+```

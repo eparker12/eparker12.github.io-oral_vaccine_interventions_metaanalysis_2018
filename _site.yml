@@ -1,0 +1,48 @@
+name: Metaanalysis
+output_dir: '.'
+navbar:
+  title: Meta-analysis of oral vaccine interventions
+  left:
+  - icon: glyphicon-home
+    href: index.html
+  - text: Select intervention
+    icon: glyphicon-stats
+    menu:
+    - text: Breastfeeding withheld
+      href: Breastfeeding_withheld.html
+    - text: Buffer
+      href: Buffer.html
+    - text: Delayed first dose
+      href: Delayed_first_dose.html
+    - text: Extra dose at birth
+      href: Extra_dose_at_birth.html
+    - text: Extra dose(s)
+      href: Extra_dose_s_.html
+    - text: Increased vaccine inoculum
+      href: Increased_vaccine_inoculum.html
+    - text: Narrow dose interval
+      href: Narrow_dose_interval.html
+    - text: OPV valence
+      href: OPV_valence.html
+    - text: Probiotic
+      href: Probiotic.html
+    - text: RVV separated from OPV
+      href: RVV_separated_from_OPV.html
+    - text: Vitamin A
+      href: Vitamin_A.html
+    - text: Zinc
+      href: Zinc.html
+  right:
+  - text: Summary
+    icon: glyphicon-menu-hamburger
+    href: summary.html
+  - text: Footnotes
+    href: footnotes.html
+  - icon: fa-github fa-lg
+    href: https://github.com/eparker12/oral_vaccine_interventions_metaanalysis_2018
+output:
+  html_document:
+    theme: yeti
+    lib_dir: site_libs
+    self_contained: no
+

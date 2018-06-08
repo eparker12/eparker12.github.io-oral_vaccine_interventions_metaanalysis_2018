@@ -1,0 +1,15 @@
+---
+title: "Overview"
+---
+
+#### Meta-analysis of oral vaccine interventions, Church et al (2018)
+
+* This e-appendix contains the forest plots, funnel plots, and statistical outputs for the meta-analysis of interventions to improve oral vaccine immunogenicity described by Church et al (2018).
+
+* Results for each intervention can be found using the 'Select intervention' drop-down menu.
+
+* A summary figure that combines findings across interventions can be found in the 'Summary' tab.
+
+* Relevant footnotes and abbreviations for these figures can be found in the 'Footnotes' tab.
+
+Code and input data required to recreate these analyses can be found [here](https://github.com/eparker12/oral_vaccine_interventions_metaanalysis_2018).
