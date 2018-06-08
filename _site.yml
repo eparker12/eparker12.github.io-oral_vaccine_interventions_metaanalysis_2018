@@ -37,7 +37,7 @@ navbar:
     icon: glyphicon-menu-hamburger
     href: summary.html
   - text: Footnotes
-    href: footnotes.html
+    href: Footnotes.html
   - icon: fa-github fa-lg
     href: https://github.com/eparker12/oral_vaccine_interventions_metaanalysis_2018
 output:
