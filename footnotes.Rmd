@@ -1,0 +1,22 @@
+---
+output:
+    html_document:
+        theme: yeti
+title: "Footnotes and acronyms"
+### Written by Edward Parker (edward.parker@imperial.ac.uk), 29 May 2018
+---
+<br/>
+Footnotes    
+     
+```{r, echo=FALSE, message=FALSE, warning=FALSE}    
+library(DT)    
+footnotes = read.csv("Church_et_al_2018_metaregression_footnotes.csv", header=TRUE, stringsAsFactors=FALSE)
+DT::datatable(footnotes, options = list(searching = FALSE, paging = FALSE))    
+``` 
+<br/>
+Acronyms     
+     
+```{r, echo=FALSE, message=FALSE, warning=FALSE}    
+acronyms = read.csv("Church_et_al_2018_metaregression_acronyms.csv", header=TRUE, stringsAsFactors=FALSE) 
+DT::datatable(acronyms, options = list(searching = FALSE, paging = FALSE))    
+``` 
