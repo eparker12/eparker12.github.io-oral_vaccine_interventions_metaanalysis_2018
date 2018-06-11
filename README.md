@@ -28,7 +28,7 @@ This basic Rmd file requires the following:
 - *Church_et_al_2018_metaregression_input.csv* – containing the input data;    
 - *Church_et_al_2018_plot_settings.csv* - containing the plotting parameters for each intervention (axis limits, plot height, plot width, and footnote coordinates).    
 
-## Compiling the anlaysis from the command line
+## Compiling the analysis from the command line
 
 Although the final analyses can be generated solely in R using the files provided, we used the script contained in *Church_et_al_2018_command_line_compiler.sh* to generate the intervention-specific analysis scripts from the basic *Church_et_al_metaregression.Rmd* script in unix. This script also renders the analyses into the *[e-appendix](https://eparker12.github.io/oral_vaccine_interventions_metaanalysis_2018)*.
 
