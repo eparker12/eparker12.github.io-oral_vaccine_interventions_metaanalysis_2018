@@ -8,6 +8,8 @@ navbar:
   - text: Select intervention
     icon: glyphicon-stats
     menu:
+    - text: Antihelminthic
+      href: Antihelminthic.html
     - text: Breastfeeding withheld
       href: Breastfeeding_withheld.html
     - text: Buffer

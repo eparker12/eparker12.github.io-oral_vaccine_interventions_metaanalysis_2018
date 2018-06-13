@@ -6,7 +6,7 @@ output:
         toc_depth: 3
         toc_float:
             collapsed: false
-title: "intervention_placeholder"
+title: "Antihelminthic"
 ### Written by Edward Parker (edward.parker@imperial.ac.uk), 29 May 2018
 ---
 
@@ -23,7 +23,7 @@ data = read.csv("Church_et_al_2018_metaregression_input.csv",header=TRUE, string
 settings = read.csv("Church_et_al_2018_plot_settings.csv",header=TRUE, stringsAsFactors=FALSE)
 
 # Select intervention, then subset data
-intervention = "intervention_placeholder"
+intervention = "Antihelminthic"
 data1 = subset(data, Intervention_category==intervention)
 
 # Replace '--' with '-' characters in age column

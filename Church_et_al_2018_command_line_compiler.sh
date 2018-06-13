@@ -31,7 +31,7 @@ WD=***insert_file_path*** ### e.g. WD=/Users/Desktop/
 # 2) Copy and paste the code below into the command line
 
 # Create intervention-specific markdowns by amending Church_et_al_2018_metaregression.Rmd base file
-for intervention in "Breastfeeding withheld" "Buffer" "Delayed first dose" "Extra dose at birth" "Extra dose(s)" "Increased vaccine inoculum" "Narrow dose interval" "OPV valence" "Probiotic" "RVV separated from OPV" "Vitamin A" "Zinc"; do
+for intervention in "Antihelminthic" "Breastfeeding withheld" "Buffer" "Delayed first dose" "Extra dose at birth" "Extra dose(s)" "Increased vaccine inoculum" "Narrow dose interval" "OPV valence" "Probiotic" "RVV separated from OPV" "Vitamin A" "Zinc"; do
     echo "${intervention[@]}"
     cp "${WD}/Church_et_al_2018_metaregression.R" "${WD}/${intervention[@]}.Rmd";
     sed -i '' "s/intervention_placeholder/$intervention/" "${WD}/${intervention}.Rmd";
