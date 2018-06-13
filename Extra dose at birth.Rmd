@@ -55,7 +55,7 @@ data_all = rbind(data_cholera, data_rota, data_PV3)
 data_PV_all = rbind(data_PV1, data_PV2, data_PV3)
 
 # Set minimum study count for inclusion in meta-analysis
-min = 3
+min = 2
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -283,7 +283,7 @@ if (nrow(data_all)>=min) {
         grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_all$QE,2),format='f',digits=2), ", df ", meta_all$k-meta_all$p, "), p < 0.001"),
         footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
     
-} else { print("Insufficient studies (n<3)") }
+} else { print("Insufficient studies (n<2)") }
 ```
 
 ### Funnel plot
@@ -310,23 +310,23 @@ if (nrow(dat_all)>=min & intervention!="RVV separated from OPV" & mixed_all$QMp>
 if (nrow(dat_all)>=min & (intervention=="RVV separated from OPV" | mixed_all$QMp<0.05)) {
     print("Infants replicated across vaccines or vaccine effect significant, therefore separate tests performed")
     print("Cholera:")
-    if (nrow(data_cholera)>=min) { print(regtest(meta_cholera, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+    if (nrow(data_cholera)>=3) { print(regtest(meta_cholera, predictor="sei")) } else { print("Insufficient studies (n<3)")}
     print("Rotavirus:")
-    if (nrow(data_rota)>=min) { print(regtest(meta_rota, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+    if (nrow(data_rota)>=3) { print(regtest(meta_rota, predictor="sei")) } else { print("Insufficient studies (n<3)")}
     print("OPV3:")
-    if (nrow(data_PV3)>=min) { print(regtest(meta_PV3, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+    if (nrow(data_PV3)>=3) { print(regtest(meta_PV3, predictor="sei")) } else { print("Insufficient studies (n<3)")}
 }
 ```
 
 ### Meta-analysis output
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (nrow(data_all)>=min) { summary(meta_all) } else { print("Insufficient studies (n<3)") }
+if (nrow(data_all)>=min) { summary(meta_all) } else { print("Insufficient studies (n<2)") }
 ```
 
 ### Meta-regression output
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # If more than one type of vaccine included in analysis, print meta-regression results
-if (nrow(dat_all)>=min & n_vaccines>1) { mixed_all } else {  print("Insufficient studies for meta-regression (either <3 studies or only 1 vaccine type)") }
+if (nrow(dat_all)>=min & n_vaccines>1) { mixed_all } else {  print("Insufficient studies for meta-regression (either <2 studies or only 1 vaccine type)") }
 ```
 
 ### Intervention-specific outputs
@@ -334,19 +334,19 @@ if (nrow(dat_all)>=min & n_vaccines>1) { mixed_all } else {  print("Insufficient
 #### Summary of cholera studies
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (nrow(data_cholera)>=min) { summary(meta_cholera) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_cholera)>=min) { summary(meta_cholera) } else { print("Insufficient studies (n<2)")}
 ```
 
 #### Summary of rotavirus studies
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (nrow(data_rota)>=min) { summary(meta_rota) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_rota)>=min) { summary(meta_rota) } else { print("Insufficient studies (n<2)")}
 ```
 
 #### Summary of PV3 studies
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (nrow(data_PV3)>=min) { summary(meta_PV3) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV3)>=min) { summary(meta_PV3) } else { print("Insufficient studies (n<2)")}
 ```
 
 ## OPV-specific analysis
@@ -563,7 +563,7 @@ if (nrow(data_PV_all)>=min) {
         grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_PV_all$QE,2),format='f',digits=2), ", df ", meta_PV_all$k-meta_PV_all$p, "), p < 0.001"),
         0.1, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
     
-} else { print("Insufficient studies (n<3)")}
+} else { print("Insufficient studies (n<2)")}
 ```
 
 ### Funnel plot
@@ -579,7 +579,7 @@ if (overall_PV_sum>0) {
     ylab('SE (log RR)') + xlab('log RR') +  scale_y_reverse() + xlim(-2,2) +
     scale_color_manual(values = c("OPV1" = "#f1cd4f", "OPV2" = "#734109" , "OPV3" =  "#F1A44F")) +
     theme(legend.title=element_blank(), legend.position="right")
-} else { print("Insufficient studies (n<3)")}
+} else { print("Insufficient studies (n<2)")}
 ```
 
 ### Egger's test
@@ -589,22 +589,22 @@ Infants replicated across vaccines, therefore separate tests performed
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # Perform Egger's test; this should be stratified by vaccine type to account for replication of infants across PV serotypes
 print("OPV1:")
-if (nrow(data_PV1)>=min) { print(regtest(meta_PV1, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV1)>=3) { print(regtest(meta_PV1, predictor="sei")) } else { print("Insufficient studies (n<3)")}
 print("OPV2:")
-if (nrow(data_PV2)>=min) { print(regtest(meta_PV2, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV2)>=3) { print(regtest(meta_PV2, predictor="sei")) } else { print("Insufficient studies (n<3)")}
 print("OPV3:")
-if (nrow(data_PV3)>=min) { print(regtest(meta_PV3, predictor="sei")) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV3)>=3) { print(regtest(meta_PV3, predictor="sei")) } else { print("Insufficient studies (n<3)")}
 ```
 
 ### Meta-analysis output
 ```{r, echo=FALSE, message=TRUE, warning=TRUE}
-if (nrow(data_PV_all)>=min) { summary(meta_PV_all) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV_all)>=min) { summary(meta_PV_all) } else { print("Insufficient studies (n<2)")}
 ```
 
 ### Meta-regression output
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # If more than one type of vaccine included in analysis, print meta-regression results
-if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { mixed_PV_all } else {  print("Insufficient studies for meta-regression (either <3 studies or only 1 vaccine type)") }
+if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { mixed_PV_all } else {  print("Insufficient studies for meta-regression (either <2 studies or only 1 vaccine type)") }
 ```
 
 ### Serotype-specific outputs
@@ -612,17 +612,17 @@ if (nrow(data_PV_all)>=min & n_PV_vaccines>1) { mixed_PV_all } else {  print("In
 #### Summary of PV1 studies
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (nrow(data_PV1)>=min) { summary(meta_PV1) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV1)>=min) { summary(meta_PV1) } else { print("Insufficient studies (n<2)")}
 ```
 
 #### Summary of PV2 studies
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (nrow(data_PV2)>=min) { summary(meta_PV2) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV2)>=min) { summary(meta_PV2) } else { print("Insufficient studies (n<2)")}
 ```
 
 #### Summary of PV3 studies
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (nrow(data_PV3)>=min) { summary(meta_PV3) } else { print("Insufficient studies (n<3)")}
+if (nrow(data_PV3)>=min) { summary(meta_PV3) } else { print("Insufficient studies (n<2)")}
 ```
