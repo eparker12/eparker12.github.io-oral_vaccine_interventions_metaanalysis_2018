@@ -303,6 +303,8 @@ theme(legend.title=element_blank(), legend.position="right")
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # Perform Egger's test; for 'RVV separated from OPV', this should be stratified by vaccine type to account for replication of infants for RVV and OPV outcomes
+if (nrow(dat_all)<3) { print("Insufficient studies (n<3)") }
+
 if (nrow(dat_all)>=3 & intervention!="RVV separated from OPV" & mixed_all$QMp>=0.05) {
     print("No replication of infants across vaccines or significant vaccine effect, therefore combined test performed")
     regtest(meta_all, predictor="sei") }
