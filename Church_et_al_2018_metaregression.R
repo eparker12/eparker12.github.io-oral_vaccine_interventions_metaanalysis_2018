@@ -254,7 +254,7 @@ fn_sum <- local({
     }
 })
 
-# Creat forest plot
+# Create forest plot
 if (nrow(data_all)>=min) {
     forestplot(tabletext,exp(m),exp(l),exp(u),zero=1,
     is.summary=c(TRUE,TRUE,!is.na(tabletext[3:nrow(tabletext),1]) & (tabletext[3:nrow(tabletext),1]=="Summary" | tabletext[3:nrow(tabletext),1]=="Overall"| tabletext[3:nrow(tabletext),1]=="Cholera"| tabletext[3:nrow(tabletext),1]=="Rotavirus"| tabletext[3:nrow(tabletext),1]=="OPV3")),
@@ -535,7 +535,7 @@ fn_sum <- local({
     }
 })
 
-# Creat forest plot
+# Create forest plot
 if (nrow(data_PV_all)>=min) {
     forestplot(tabletext,exp(m),exp(l),exp(u),zero=1,
     is.summary=c(TRUE,TRUE,!is.na(tabletext[3:nrow(tabletext),1]) & (tabletext[3:nrow(tabletext),1]=="Summary" | tabletext[3:nrow(tabletext),1]=="Overall"| tabletext[3:nrow(tabletext),1]=="OPV1"| tabletext[3:nrow(tabletext),1]=="OPV2"| tabletext[3:nrow(tabletext),1]=="OPV3")),

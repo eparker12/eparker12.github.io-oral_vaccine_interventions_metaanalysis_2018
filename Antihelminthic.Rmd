@@ -254,7 +254,7 @@ fn_sum <- local({
     }
 })
 
-# Creat forest plot
+# Create forest plot
 if (nrow(data_all)>=min) {
     forestplot(tabletext,exp(m),exp(l),exp(u),zero=1,
     is.summary=c(TRUE,TRUE,!is.na(tabletext[3:nrow(tabletext),1]) & (tabletext[3:nrow(tabletext),1]=="Summary" | tabletext[3:nrow(tabletext),1]=="Overall"| tabletext[3:nrow(tabletext),1]=="Cholera"| tabletext[3:nrow(tabletext),1]=="Rotavirus"| tabletext[3:nrow(tabletext),1]=="OPV3")),
@@ -304,7 +304,6 @@ theme(legend.title=element_blank(), legend.position="right")
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # Perform Egger's test; for 'RVV separated from OPV', this should be stratified by vaccine type to account for replication of infants for RVV and OPV outcomes
 if (nrow(dat_all)<3) { print("Insufficient studies (n<3)") }
-
 if (nrow(dat_all)>=3 & intervention!="RVV separated from OPV" & mixed_all$QMp>=0.05) {
     print("No replication of infants across vaccines or significant vaccine effect, therefore combined test performed")
     regtest(meta_all, predictor="sei") }
@@ -536,7 +535,7 @@ fn_sum <- local({
     }
 })
 
-# Creat forest plot
+# Create forest plot
 if (nrow(data_PV_all)>=min) {
     forestplot(tabletext,exp(m),exp(l),exp(u),zero=1,
     is.summary=c(TRUE,TRUE,!is.na(tabletext[3:nrow(tabletext),1]) & (tabletext[3:nrow(tabletext),1]=="Summary" | tabletext[3:nrow(tabletext),1]=="Overall"| tabletext[3:nrow(tabletext),1]=="OPV1"| tabletext[3:nrow(tabletext),1]=="OPV2"| tabletext[3:nrow(tabletext),1]=="OPV3")),
