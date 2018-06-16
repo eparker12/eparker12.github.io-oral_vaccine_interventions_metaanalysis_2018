@@ -42,6 +42,7 @@ footnote_x_main = settings[which(settings$intervention==intervention),"footnote_
 footnote_y_main = settings[which(settings$intervention==intervention),"footnote_y_main"]
 footnote_x_polio = settings[which(settings$intervention==intervention),"footnote_x_polio"]
 footnote_y_polio = settings[which(settings$intervention==intervention),"footnote_y_polio"]
+column_gap_main = settings[which(settings$intervention==intervention),"column_gap_main"]
 
 # Create subsets of data for each vaccine target
 data_cholera = subset(data1,Vaccine=="Cholera")
@@ -262,7 +263,7 @@ if (nrow(data_all)>=min) {
     xticks=c(forest_x_min_main,1,forest_x_max_main),
     fn.ci_norm=fn,
     fn.ci_sum=fn_sum,
-    colgap=unit(5,"mm"),
+    colgap=unit(column_gap_main,"mm"),
     txt_gp = fpTxtGp(ticks = gpar(cex=0.8))
     )
     
