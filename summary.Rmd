@@ -9,7 +9,7 @@ title: "Summary of intervention effects"
 ```{r, echo=FALSE, message=FALSE, fig.height=3.5, fig.width=9}
 d = read.csv("Church_et_al_2018_summary.csv", stringsAsFactors = FALSE)
 d$Vaccine = as.factor(d$Vaccine)
-d$Vaccine = factor(d$Vaccine, levels = c("OCV", "RRV", "OPV"))
+d$Vaccine = factor(d$Vaccine, levels = c("OCV", "RVV", "OPV"))
 
 library(ggplot2)
 ggplot(d, aes(y = RR, x = factor(Intervention), colour = Vaccine, shape = Studies)) + 
