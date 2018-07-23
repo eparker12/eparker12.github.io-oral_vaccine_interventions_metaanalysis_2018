@@ -25,7 +25,9 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -93,6 +95,9 @@ img {
 }
 .tabbed-pane {
   padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
 }
 button.code-folding-btn:focus {
   outline: none;
@@ -477,16 +482,59 @@ div.tocify {
 <pre><code>## [1] &quot;Insufficient studies (n&lt;2)&quot;</code></pre>
 </div>
 </div>
+<div id="meta-regression-secondary-moderators" class="section level3">
+<h3>Meta-regression: secondary moderators</h3>
+<div id="age-group" class="section level4">
+<h4>Age group</h4>
+<pre><code>## 
+##  child infant 
+##      3      3</code></pre>
+<pre><code>## 
+## Mixed-Effects Model (k = 6; tau^2 estimator: REML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0000 (SE = 0.0211)
+## tau (square root of estimated tau^2 value):             0.0026
+## I^2 (residual heterogeneity / unaccounted variability): 0.02%
+## H^2 (unaccounted variability / sampling variability):   1.00
+## R^2 (amount of heterogeneity accounted for):            99.99%
+## 
+## Test for Residual Heterogeneity: 
+## QE(df = 4) = 4.8244, p-val = 0.3058
+## 
+## Test of Moderators (coefficient(s) 2): 
+## QM(df = 1) = 9.7173, p-val = 0.0018
+## 
+## Model Results:
+## 
+##                          estimate      se     zval    pval    ci.lb
+## intrcpt                    0.3500  0.1022   3.4237  0.0006   0.1497
+## factor(Age_group)infant   -0.4023  0.1291  -3.1173  0.0018  -0.6553
+##                            ci.ub     
+## intrcpt                   0.5504  ***
+## factor(Age_group)infant  -0.1494   **
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="income-setting" class="section level4">
+<h4>Income setting</h4>
+<pre><code>## [1] &quot;No variation in moderator among studies&quot;</code></pre>
+</div>
+<div id="high-baseline-immunogenicity" class="section level4">
+<h4>High baseline immunogenicity</h4>
+<pre><code>## [1] &quot;No variation in moderator among studies&quot;</code></pre>
+</div>
+</div>
 </div>
 <div id="opv-specific-analysis" class="section level2">
 <h2>OPV-specific analysis</h2>
 <div id="forest-plot-1" class="section level3">
 <h3>Forest plot</h3>
-<p><img src="Zinc_files/figure-html/unnamed-chunk-12-1.png" width="1152" /></p>
+<p><img src="Zinc_files/figure-html/unnamed-chunk-15-1.png" width="1152" /></p>
 </div>
 <div id="funnel-plot-1" class="section level3">
 <h3>Funnel plot</h3>
-<p><img src="Zinc_files/figure-html/unnamed-chunk-13-1.png" width="576" /></p>
+<p><img src="Zinc_files/figure-html/unnamed-chunk-16-1.png" width="576" /></p>
 </div>
 <div id="eggers-test-1" class="section level3">
 <h3>Egger’s test</h3>

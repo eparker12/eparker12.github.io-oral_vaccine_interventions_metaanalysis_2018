@@ -351,6 +351,62 @@ if (nrow(data_rota)>=min) { summary(meta_rota) } else { print("Insufficient stud
 if (nrow(data_PV3)>=min) { summary(meta_PV3) } else { print("Insufficient studies (n<2)")}
 ```
 
+### Meta-regression: secondary moderators
+
+#### Age group
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nlevels(factor(dat_all$Age_group))==1) { print("No variation in moderator among studies") }
+if (nlevels(factor(dat_all$Age_group))==nrow(dat_all)) { print("Insufficient studies (n studies == n moderators)") }
+
+# Perform mixed-effects meta-regression, including random effect on study ID for 'RVV separated from OPV'
+if (nrow(dat_all)>=min & nlevels(factor(dat_all$Age_group))>1 & nlevels(factor(dat_all$Age_group))<nrow(dat_all) & intervention=="RVV separated from OPV") {
+    print(table(dat_all$Age_group))
+    meteregression_age = rma.mv(yi, vi, mods = ~ factor(Age_group), data = dat_all,  method = "REML", random = ~ 1 | Reference)
+    meteregression_age
+}
+if (nrow(dat_all)>=min & nlevels(factor(dat_all$Age_group))>1 & nlevels(factor(dat_all$Age_group))<nrow(dat_all) & intervention!="RVV separated from OPV") {
+    print(table(dat_all$Age_group))
+    meteregression_age = rma(yi, vi, mods = ~ factor(Age_group), data = dat_all,  method = "REML")
+    meteregression_age
+}
+```
+
+#### Income setting
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nlevels(factor(dat_all$Income_setting))==1) { print("No variation in moderator among studies") }
+if (nlevels(factor(dat_all$Income_setting))==nrow(dat_all)) { print("Insufficient studies (n studies == n moderators)") }
+
+# Perform mixed-effects meta-regression, including random effect on study ID for 'RVV separated from OPV'
+if (nrow(dat_all)>=min & nlevels(factor(dat_all$Income_setting))>1 & nlevels(factor(dat_all$Income_setting))<nrow(dat_all) & intervention=="RVV separated from OPV") {
+    print(table(dat_all$Income_setting))
+    meteregression_setting = rma.mv(yi, vi, mods = ~ factor(Income_setting), data = dat_all,  method = "REML", random = ~ 1 | Reference)
+    meteregression_setting
+}
+if (nrow(dat_all)>=min & nlevels(factor(dat_all$Income_setting))>1 & nlevels(factor(dat_all$Income_setting))<nrow(dat_all) & intervention!="RVV separated from OPV") {
+    print(table(dat_all$Income_setting))
+    meteregression_setting = rma(yi, vi, mods = ~ factor(Income_setting), data = dat_all,  method = "REML")
+    meteregression_setting
+}
+```
+
+#### High baseline immunogenicity
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (nlevels(factor(dat_all$High_baseline))==1) { print("No variation in moderator among studies") }
+if (nlevels(factor(dat_all$High_baseline))==nrow(dat_all)) { print("Insufficient studies (n studies == n moderators)") }
+
+# Perform mixed-effects meta-regression, including random effect on study ID for 'RVV separated from OPV'
+if (nrow(dat_all)>=min & nlevels(factor(dat_all$High_baseline))>1 & nlevels(factor(dat_all$High_baseline))<nrow(dat_all) & intervention=="RVV separated from OPV") {
+    print(table(dat_all$High_baseline))
+    meteregression_baseline = rma.mv(yi, vi, mods = ~ factor(High_baseline), data = dat_all,  method = "REML", random = ~ 1 | Reference)
+    meteregression_baseline
+}
+if (nrow(dat_all)>=min & nlevels(factor(dat_all$High_baseline))>1 & nlevels(factor(dat_all$High_baseline))<nrow(dat_all) & intervention!="RVV separated from OPV") {
+    print(table(dat_all$High_baseline))
+    meteregression_baseline = rma(yi, vi, mods = ~ factor(High_baseline), data = dat_all,  method = "REML")
+    meteregression_baseline
+}
+```
+
 ## OPV-specific analysis
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}

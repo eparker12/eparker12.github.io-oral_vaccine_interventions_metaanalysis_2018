@@ -25,7 +25,9 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -93,6 +95,9 @@ img {
 }
 .tabbed-pane {
   padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
 }
 button.code-folding-btn:focus {
   outline: none;
@@ -496,16 +501,121 @@ div.tocify {
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 </div>
+<div id="meta-regression-secondary-moderators" class="section level3">
+<h3>Meta-regression: secondary moderators</h3>
+<div id="age-group" class="section level4">
+<h4>Age group</h4>
+<pre><code>## 
+##    adult    child   infant multiple 
+##        3        2        5        1</code></pre>
+<pre><code>## 
+## Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0000 (SE = 0.0039)
+## tau (square root of estimated tau^2 value):             0.0020
+## I^2 (residual heterogeneity / unaccounted variability): 0.04%
+## H^2 (unaccounted variability / sampling variability):   1.00
+## R^2 (amount of heterogeneity accounted for):            7.45%
+## 
+## Test for Residual Heterogeneity: 
+## QE(df = 7) = 12.9934, p-val = 0.0723
+## 
+## Test of Moderators (coefficient(s) 2:4): 
+## QM(df = 3) = 3.9241, p-val = 0.2698
+## 
+## Model Results:
+## 
+##                            estimate      se     zval    pval    ci.lb
+## intrcpt                      0.2139  0.0924   2.3161  0.0206   0.0329
+## factor(Age_group)child      -0.1603  0.1186  -1.3508  0.1768  -0.3928
+## factor(Age_group)infant     -0.1933  0.0986  -1.9612  0.0499  -0.3865
+## factor(Age_group)multiple   -0.2196  0.2211  -0.9934  0.3205  -0.6529
+##                              ci.ub   
+## intrcpt                     0.3949  *
+## factor(Age_group)child      0.0723   
+## factor(Age_group)infant    -0.0001  *
+## factor(Age_group)multiple   0.2137   
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="income-setting" class="section level4">
+<h4>Income setting</h4>
+<pre><code>## 
+##          low lower_middle upper_middle 
+##            2            5            4</code></pre>
+<pre><code>## 
+## Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0096 (SE = 0.0126)
+## tau (square root of estimated tau^2 value):             0.0981
+## I^2 (residual heterogeneity / unaccounted variability): 39.88%
+## H^2 (unaccounted variability / sampling variability):   1.66
+## R^2 (amount of heterogeneity accounted for):            0.00%
+## 
+## Test for Residual Heterogeneity: 
+## QE(df = 8) = 14.5079, p-val = 0.0694
+## 
+## Test of Moderators (coefficient(s) 2:3): 
+## QM(df = 2) = 2.5282, p-val = 0.2825
+## 
+## Model Results:
+## 
+##                                     estimate      se     zval    pval
+## intrcpt                               0.0735  0.0944   0.7786  0.4362
+## factor(Income_setting)lower_middle   -0.0477  0.1162  -0.4108  0.6812
+## factor(Income_setting)upper_middle    0.1400  0.1355   1.0334  0.3014
+##                                       ci.lb   ci.ub   
+## intrcpt                             -0.1115  0.2585   
+## factor(Income_setting)lower_middle  -0.2754  0.1800   
+## factor(Income_setting)upper_middle  -0.1255  0.4055   
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="high-baseline-immunogenicity" class="section level4">
+<h4>High baseline immunogenicity</h4>
+<pre><code>## 
+##  no yes 
+##  10   1</code></pre>
+<pre><code>## 
+## Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0000 (SE = 0.0055)
+## tau (square root of estimated tau^2 value):             0.0011
+## I^2 (residual heterogeneity / unaccounted variability): 0.01%
+## H^2 (unaccounted variability / sampling variability):   1.00
+## R^2 (amount of heterogeneity accounted for):            70.45%
+## 
+## Test for Residual Heterogeneity: 
+## QE(df = 9) = 14.9979, p-val = 0.0910
+## 
+## Test of Moderators (coefficient(s) 2): 
+## QM(df = 1) = 1.9213, p-val = 0.1657
+## 
+## Model Results:
+## 
+##                           estimate      se     zval    pval    ci.lb
+## intrcpt                     0.0768  0.0374   2.0538  0.0400   0.0035
+## factor(High_baseline)yes   -0.0833  0.0601  -1.3861  0.1657  -0.2012
+##                            ci.ub   
+## intrcpt                   0.1501  *
+## factor(High_baseline)yes  0.0345   
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+</div>
 </div>
 <div id="opv-specific-analysis" class="section level2">
 <h2>OPV-specific analysis</h2>
 <div id="forest-plot-1" class="section level3">
 <h3>Forest plot</h3>
-<p><img src="Increased_vaccine_inoculum_files/figure-html/unnamed-chunk-12-1.png" width="1248" /></p>
+<p><img src="Increased_vaccine_inoculum_files/figure-html/unnamed-chunk-15-1.png" width="1248" /></p>
 </div>
 <div id="funnel-plot-1" class="section level3">
 <h3>Funnel plot</h3>
-<p><img src="Increased_vaccine_inoculum_files/figure-html/unnamed-chunk-13-1.png" width="576" /></p>
+<p><img src="Increased_vaccine_inoculum_files/figure-html/unnamed-chunk-16-1.png" width="576" /></p>
 </div>
 <div id="eggers-test-1" class="section level3">
 <h3>Egger’s test</h3>
