@@ -268,20 +268,20 @@ if (nrow(input_all)>=min) {
     )
     
     # Add footnote containing heterogeneity results
-    if (nrow(data_all)>=min & n_vaccines>1 & mixed_all$QEp>=0.001) {
+    if (nrow(data_all)>=min & n_vaccines>1 & mixed_all$QEp>=0.0001) {
         grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_all$QM,2),format='f',digits=2), ", df ", mixed_all$m, "), p = ", formatC(round(mixed_all$QMp,3),format='f',digits=3),
         "; Residual heterogeneity (Qe ", formatC(round(mixed_all$QE,2),format='f',digits=2), ", df ", mixed_all$k-mixed_all$p, "), p = ", formatC(round(mixed_all$QEp,3),format='f',digits=3)),
         footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
-    if (nrow(data_all)>=min & n_vaccines>1 & mixed_all$QEp<0.001) {
+    if (nrow(data_all)>=min & n_vaccines>1 & mixed_all$QEp<0.0001) {
         grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_all$QM,2),format='f',digits=2), ", df ", mixed_all$m, "), p = ", formatC(round(mixed_all$QMp,3),format='f',digits=3),
-        "; Residual heterogeneity (Qe ", formatC(round(mixed_all$QE,2),format='f',digits=2), ", df ", mixed_all$k-mixed_all$p, "), p < 0.001"),
+        "; Residual heterogeneity (Qe ", formatC(round(mixed_all$QE,2),format='f',digits=2), ", df ", mixed_all$k-mixed_all$p, "), p < 0.0001"),
         footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
     
-    if (nrow(data_all)>=min & n_vaccines==1 & meta_all$QEp>=0.001) {
+    if (nrow(data_all)>=min & n_vaccines==1 & meta_all$QEp>=0.0001) {
         grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_all$QE,2),format='f',digits=2), ", df ", meta_all$k-meta_all$p, "), p = ", formatC(round(meta_all$QEp,3),format='f',digits=3)),
         footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
-    if (nrow(data_all)>=min & n_vaccines==1 & meta_all$QEp<0.001) {
-        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_all$QE,2),format='f',digits=2), ", df ", meta_all$k-meta_all$p, "), p < 0.001"),
+    if (nrow(data_all)>=min & n_vaccines==1 & meta_all$QEp<0.0001) {
+        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_all$QE,2),format='f',digits=2), ", df ", meta_all$k-meta_all$p, "), p < 0.0001"),
         footnote_x_main, footnote_y_main, gp = gpar(fontsize=12, font = "sans")) }
     
 } else { print("Insufficient studies (n<2)") }
@@ -616,20 +616,20 @@ if (nrow(input_PV_all)>=min) {
     )
     
     # Add footnote containing heterogeneity results
-    if (nrow(input_PV_all)>=min & n_PV_vaccines>1 & mixed_PV_all$QEp>=0.001) {
+    if (nrow(input_PV_all)>=min & n_PV_vaccines>1 & mixed_PV_all$QEp>=0.0001) {
         grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_PV_all$QM,2),format='f',digits=2), ", df ", mixed_PV_all$m, "), p = ", formatC(round(mixed_PV_all$QMp,3),format='f',digits=3),
         "; Residual heterogeneity (Qe ", formatC(round(mixed_PV_all$QE,2),format='f',digits=2), ", df ", mixed_PV_all$k-mixed_PV_all$p, "), p = ", formatC(round(mixed_PV_all$QEp,3),format='f',digits=3)),
         footnote_x_polio, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
-    if (nrow(input_PV_all)>=min & n_PV_vaccines>1 & mixed_PV_all$QEp<0.001) {
+    if (nrow(input_PV_all)>=min & n_PV_vaccines>1 & mixed_PV_all$QEp<0.0001) {
         grid.text(paste0("Heterogeneity among vaccines (Qm ", formatC(round(mixed_PV_all$QM,2),format='f',digits=2), ", df ", mixed_PV_all$m, "), p = ", formatC(round(mixed_PV_all$QMp,3),format='f',digits=3),
-        "; Residual heterogeneity (Qe ", formatC(round(mixed_PV_all$QE,2),format='f',digits=2), ", df ", mixed_PV_all$k-mixed_PV_all$p, "), p < 0.001"),
+        "; Residual heterogeneity (Qe ", formatC(round(mixed_PV_all$QE,2),format='f',digits=2), ", df ", mixed_PV_all$k-mixed_PV_all$p, "), p < 0.0001"),
         footnote_x_polio, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
     
-    if (nrow(input_PV_all)>=min & n_PV_vaccines==1 & meta_PV_all$QEp>=0.001) {
+    if (nrow(input_PV_all)>=min & n_PV_vaccines==1 & meta_PV_all$QEp>=0.0001) {
         grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_PV_all$QE,2),format='f',digits=2), ", df ", meta_PV_all$k-meta_PV_all$p, "), p = ", formatC(round(meta_PV_all$QEp,3),format='f',digits=3)),
         0.1, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
-    if (nrow(input_PV_all)>=min & n_PV_vaccines==1 & meta_PV_all$QEp<0.001) {
-        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_PV_all$QE,2),format='f',digits=2), ", df ", meta_PV_all$k-meta_PV_all$p, "), p < 0.001"),
+    if (nrow(input_PV_all)>=min & n_PV_vaccines==1 & meta_PV_all$QEp<0.0001) {
+        grid.text(paste0("Heterogeneity (Q ", formatC(round(meta_PV_all$QE,2),format='f',digits=2), ", df ", meta_PV_all$k-meta_PV_all$p, "), p < 0.0001"),
         0.1, footnote_y_polio, gp = gpar(fontsize=12, font = "sans")) }
     
 } else { print("Insufficient studies (n<2)")}
