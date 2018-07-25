@@ -468,67 +468,60 @@ div.tocify {
 <div id="income-setting" class="section level4">
 <h4>Income setting</h4>
 <pre><code>## 
-##         high lower_middle     multiple upper_middle 
-##            1            2            1            2</code></pre>
+##  low_lowermiddle uppermiddle_high 
+##                2                4</code></pre>
 <pre><code>## 
 ## Mixed-Effects Model (k = 6; tau^2 estimator: REML)
 ## 
-## tau^2 (estimated amount of residual heterogeneity):     0.0486 (SE = 0.0659)
-## tau (square root of estimated tau^2 value):             0.2206
-## I^2 (residual heterogeneity / unaccounted variability): 86.19%
-## H^2 (unaccounted variability / sampling variability):   7.24
-## R^2 (amount of heterogeneity accounted for):            78.18%
+## tau^2 (estimated amount of residual heterogeneity):     0.2792 (SE = 0.2099)
+## tau (square root of estimated tau^2 value):             0.5284
+## I^2 (residual heterogeneity / unaccounted variability): 99.18%
+## H^2 (unaccounted variability / sampling variability):   122.26
+## R^2 (amount of heterogeneity accounted for):            0.00%
 ## 
 ## Test for Residual Heterogeneity: 
-## QE(df = 2) = 18.3247, p-val = 0.0001
+## QE(df = 4) = 80.0459, p-val &lt; .0001
 ## 
-## Test of Moderators (coefficient(s) 2:4): 
-## QM(df = 3) = 16.0012, p-val = 0.0011
+## Test of Moderators (coefficient(s) 2): 
+## QM(df = 1) = 0.2373, p-val = 0.6261
 ## 
 ## Model Results:
 ## 
-##                                     estimate      se     zval    pval
-## intrcpt                               0.0515  0.2233   0.2305  0.8177
-## factor(Income_setting)lower_middle    0.2314  0.2761   0.8379  0.4021
-## factor(Income_setting)multiple       -0.0553  0.3142  -0.1760  0.8603
-## factor(Income_setting)upper_middle    1.0248  0.3095   3.3109  0.0009
-##                                       ci.lb   ci.ub     
-## intrcpt                             -0.3862  0.4891     
-## factor(Income_setting)lower_middle  -0.3098  0.7725     
-## factor(Income_setting)multiple      -0.6711  0.5605     
-## factor(Income_setting)upper_middle   0.4182  1.6315  ***
+##                                       estimate      se    zval    pval
+## intrcpt                                 0.2902  0.3764  0.7708  0.4408
+## factor(Income_group)uppermiddle_high    0.2270  0.4660  0.4872  0.6261
+##                                         ci.lb   ci.ub   
+## intrcpt                               -0.4476  1.0279   
+## factor(Income_group)uppermiddle_high  -0.6863  1.1403   
 ## 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
-<div id="high-baseline-immunogenicity" class="section level4">
-<h4>High baseline immunogenicity</h4>
-<pre><code>## 
-##  no yes 
-##   5   1</code></pre>
+<div id="baseline-immunogenicity-seroconversion-rate-in-the-control-group" class="section level4">
+<h4>Baseline immunogenicity (seroconversion rate in the control group)</h4>
 <pre><code>## 
 ## Mixed-Effects Model (k = 6; tau^2 estimator: REML)
 ## 
-## tau^2 (estimated amount of residual heterogeneity):     0.2305 (SE = 0.1763)
-## tau (square root of estimated tau^2 value):             0.4801
-## I^2 (residual heterogeneity / unaccounted variability): 98.21%
-## H^2 (unaccounted variability / sampling variability):   55.81
-## R^2 (amount of heterogeneity accounted for):            0.00%
+## tau^2 (estimated amount of residual heterogeneity):     0.0117 (SE = 0.0120)
+## tau (square root of estimated tau^2 value):             0.1081
+## I^2 (residual heterogeneity / unaccounted variability): 81.51%
+## H^2 (unaccounted variability / sampling variability):   5.41
+## R^2 (amount of heterogeneity accounted for):            94.76%
 ## 
 ## Test for Residual Heterogeneity: 
-## QE(df = 4) = 71.4084, p-val &lt; .0001
+## QE(df = 4) = 22.0549, p-val = 0.0002
 ## 
 ## Test of Moderators (coefficient(s) 2): 
-## QM(df = 1) = 1.0028, p-val = 0.3166
+## QM(df = 1) = 35.9598, p-val &lt; .0001
 ## 
 ## Model Results:
 ## 
-##                           estimate      se     zval    pval    ci.lb
-## intrcpt                     0.5267  0.2235   2.3567  0.0184   0.0887
-## factor(High_baseline)yes   -0.5305  0.5298  -1.0014  0.3166  -1.5688
-##                            ci.ub   
-## intrcpt                   0.9647  *
-## factor(High_baseline)yes  0.5078   
+##                                      estimate      se     zval    pval
+## intrcpt                                1.3892  0.1994   6.9680  &lt;.0001
+## asin(sqrt(Baseline_seroconversion))   -1.0354  0.1727  -5.9967  &lt;.0001
+##                                        ci.lb    ci.ub     
+## intrcpt                               0.9984   1.7800  ***
+## asin(sqrt(Baseline_seroconversion))  -1.3738  -0.6970  ***
 ## 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>

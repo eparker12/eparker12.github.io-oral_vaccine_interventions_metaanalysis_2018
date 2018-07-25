@@ -539,8 +539,8 @@ div.tocify {
 <div id="income-setting" class="section level4">
 <h4>Income setting</h4>
 <pre><code>## 
-## lower_middle upper_middle 
-##            6            1</code></pre>
+##  low_lowermiddle uppermiddle_high 
+##                6                1</code></pre>
 <pre><code>## 
 ## Mixed-Effects Model (k = 7; tau^2 estimator: REML)
 ## 
@@ -558,19 +558,44 @@ div.tocify {
 ## 
 ## Model Results:
 ## 
-##                                     estimate      se     zval    pval
-## intrcpt                              -0.1070  0.1267  -0.8446  0.3983
-## factor(Income_setting)upper_middle    0.1695  0.2993   0.5663  0.5712
-##                                       ci.lb   ci.ub   
-## intrcpt                             -0.3554  0.1413   
-## factor(Income_setting)upper_middle  -0.4172  0.7562   
+##                                       estimate      se     zval    pval
+## intrcpt                                -0.1070  0.1267  -0.8446  0.3983
+## factor(Income_group)uppermiddle_high    0.1695  0.2993   0.5663  0.5712
+##                                         ci.lb   ci.ub   
+## intrcpt                               -0.3554  0.1413   
+## factor(Income_group)uppermiddle_high  -0.4172  0.7562   
 ## 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
-<div id="high-baseline-immunogenicity" class="section level4">
-<h4>High baseline immunogenicity</h4>
-<pre><code>## [1] &quot;No variation in moderator among studies&quot;</code></pre>
+<div id="baseline-immunogenicity-seroconversion-rate-in-the-control-group" class="section level4">
+<h4>Baseline immunogenicity (seroconversion rate in the control group)</h4>
+<pre><code>## 
+## Mixed-Effects Model (k = 7; tau^2 estimator: REML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0369 (SE = 0.0420)
+## tau (square root of estimated tau^2 value):             0.1921
+## I^2 (residual heterogeneity / unaccounted variability): 56.56%
+## H^2 (unaccounted variability / sampling variability):   2.30
+## R^2 (amount of heterogeneity accounted for):            23.23%
+## 
+## Test for Residual Heterogeneity: 
+## QE(df = 5) = 11.1609, p-val = 0.0483
+## 
+## Test of Moderators (coefficient(s) 2): 
+## QM(df = 1) = 1.7566, p-val = 0.1850
+## 
+## Model Results:
+## 
+##                                      estimate      se     zval    pval
+## intrcpt                               -0.7068  0.4892  -1.4448  0.1485
+## asin(sqrt(Baseline_seroconversion))    0.8301  0.6263   1.3254  0.1850
+##                                        ci.lb   ci.ub   
+## intrcpt                              -1.6657  0.2521   
+## asin(sqrt(Baseline_seroconversion))  -0.3974  2.0576   
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 </div>
 </div>

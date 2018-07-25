@@ -487,8 +487,8 @@ div.tocify {
 <div id="age-group" class="section level4">
 <h4>Age group</h4>
 <pre><code>## 
-##  child infant 
-##      3      3</code></pre>
+## child_under5y        infant 
+##             3             3</code></pre>
 <pre><code>## 
 ## Mixed-Effects Model (k = 6; tau^2 estimator: REML)
 ## 
@@ -520,9 +520,34 @@ div.tocify {
 <h4>Income setting</h4>
 <pre><code>## [1] &quot;No variation in moderator among studies&quot;</code></pre>
 </div>
-<div id="high-baseline-immunogenicity" class="section level4">
-<h4>High baseline immunogenicity</h4>
-<pre><code>## [1] &quot;No variation in moderator among studies&quot;</code></pre>
+<div id="baseline-immunogenicity-seroconversion-rate-in-the-control-group" class="section level4">
+<h4>Baseline immunogenicity (seroconversion rate in the control group)</h4>
+<pre><code>## 
+## Mixed-Effects Model (k = 6; tau^2 estimator: REML)
+## 
+## tau^2 (estimated amount of residual heterogeneity):     0.0986 (SE = 0.0945)
+## tau (square root of estimated tau^2 value):             0.3140
+## I^2 (residual heterogeneity / unaccounted variability): 76.87%
+## H^2 (unaccounted variability / sampling variability):   4.32
+## R^2 (amount of heterogeneity accounted for):            0.00%
+## 
+## Test for Residual Heterogeneity: 
+## QE(df = 4) = 14.1815, p-val = 0.0067
+## 
+## Test of Moderators (coefficient(s) 2): 
+## QM(df = 1) = 0.0270, p-val = 0.8695
+## 
+## Model Results:
+## 
+##                                      estimate      se     zval    pval
+## intrcpt                                0.2700  1.0339   0.2612  0.7940
+## asin(sqrt(Baseline_seroconversion))   -0.2131  1.2972  -0.1643  0.8695
+##                                        ci.lb   ci.ub   
+## intrcpt                              -1.7565  2.2965   
+## asin(sqrt(Baseline_seroconversion))  -2.7556  2.3293   
+## 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 </div>
 </div>
