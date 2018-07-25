@@ -585,16 +585,17 @@ div.tocify {
 ## Variance Components: none
 ## 
 ## Test for Residual Heterogeneity: 
-## QE(df = 6) = 13.8207, p-val = 0.0317
+## QE(df = 5) = 5.8327, p-val = 0.3228
 ## 
-## Test of Moderators (coefficient(s) 2): 
-## QM(df = 1) = 5.5122, p-val = 0.0189
+## Test of Moderators (coefficient(s) 2:3): 
+## QM(df = 2) = 13.5002, p-val = 0.0012
 ## 
 ## Model Results:
 ## 
-##          estimate      se     zval    pval    ci.lb    ci.ub   
-## intrcpt    0.6113  0.2378   2.5708  0.0101   0.1452   1.0774  *
-## N_doses   -0.1878  0.0800  -2.3478  0.0189  -0.3446  -0.0310  *
+##                   estimate      se     zval    pval    ci.lb    ci.ub     
+## intrcpt             1.0696  0.2779   3.8484  0.0001   0.5249   1.6143  ***
+## factor(N_doses)2   -0.9873  0.2940  -3.3586  0.0008  -1.5634  -0.4111  ***
+## factor(N_doses)3   -1.0196  0.2784  -3.6622  0.0003  -1.5652  -0.4739  ***
 ## 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>

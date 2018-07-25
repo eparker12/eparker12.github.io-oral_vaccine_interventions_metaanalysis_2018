@@ -534,23 +534,25 @@ div.tocify {
 <pre><code>## 
 ## Mixed-Effects Model (k = 6; tau^2 estimator: REML)
 ## 
-## tau^2 (estimated amount of residual heterogeneity):     0.1823 (SE = 0.1404)
-## tau (square root of estimated tau^2 value):             0.4270
-## I^2 (residual heterogeneity / unaccounted variability): 98.72%
-## H^2 (unaccounted variability / sampling variability):   78.35
-## R^2 (amount of heterogeneity accounted for):            18.22%
+## tau^2 (estimated amount of residual heterogeneity):     0.3660 (SE = 0.3980)
+## tau (square root of estimated tau^2 value):             0.6050
+## I^2 (residual heterogeneity / unaccounted variability): 95.01%
+## H^2 (unaccounted variability / sampling variability):   20.05
+## R^2 (amount of heterogeneity accounted for):            0.00%
 ## 
 ## Test for Residual Heterogeneity: 
-## QE(df = 4) = 89.5007, p-val &lt; .0001
+## QE(df = 2) = 51.7938, p-val &lt; .0001
 ## 
-## Test of Moderators (coefficient(s) 2): 
-## QM(df = 1) = 2.2714, p-val = 0.1318
+## Test of Moderators (coefficient(s) 2:4): 
+## QM(df = 3) = 1.4504, p-val = 0.6938
 ## 
 ## Model Results:
 ## 
-##          estimate      se     zval    pval    ci.lb   ci.ub   
-## intrcpt    0.9102  0.3703   2.4580  0.0140   0.1844  1.6359  *
-## N_doses   -0.2348  0.1558  -1.5071  0.1318  -0.5401  0.0705   
+##                   estimate      se     zval    pval    ci.lb   ci.ub   
+## intrcpt             0.7190  0.3640   1.9752  0.0482   0.0055  1.4324  *
+## factor(N_doses)2   -0.2324  0.7108  -0.3270  0.7437  -1.6254  1.1607   
+## factor(N_doses)3   -0.7228  0.7062  -1.0235  0.3061  -2.1069  0.6613   
+## factor(N_doses)4   -0.6219  0.7073  -0.8792  0.3793  -2.0082  0.7644   
 ## 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
