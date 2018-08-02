@@ -390,7 +390,7 @@ if (QEp>0.05) { print("Residual heterogeneity not significant (p>0.05)")
 }
 ```
 
-#### Baseline immunogenicity (seroconversion rate in the control group)
+#### Background immunogenicity (seroconversion rate in the control group)
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 if (QEp>0.05) { print("Residual heterogeneity not significant (p>0.05)")
 } else if (intervention=="RVV separated from OPV") {
@@ -400,21 +400,6 @@ if (QEp>0.05) { print("Residual heterogeneity not significant (p>0.05)")
 } else if (intervention!="RVV separated from OPV") {
     meteregression_baseline = rma(yi, vi, mods = ~ asin(sqrt(Baseline_seroconversion)), data = data_all,  method = "REML")
     meteregression_baseline
-}
-```
-
-#### Number of doses
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if (QEp>0.05) { print("Residual heterogeneity not significant (p>0.05)")
-} else if (intervention=="RVV separated from OPV") {
-    print("Rotavirus-specific analysis performed owing to absence of significant residual heterogeneity for OPV studies")
-    print(table(data_rota$N_doses))
-    meteregression_doses = rma.mv(yi, vi, mods = ~ factor(N_doses), data = data_rota,  method = "REML")
-    meteregression_doses
-} else if (intervention!="RVV separated from OPV") {
-    print(table(data_all$N_doses))
-    meteregression_doses = rma(yi, vi, mods = ~ factor(N_doses), data = data_all,  method = "REML")
-    meteregression_doses
 }
 ```
 
